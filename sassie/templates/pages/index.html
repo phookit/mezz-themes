@@ -1,0 +1,139 @@
+{% extends "pages/page.html" %}
+{% load twitter_tags blog_tags pages_tags mezzanine_tags i18n future staticfiles %}
+
+{% block all_content %}
+    {% if page.homepage.slides.all %}
+    <div id="myCarousel" class="carousel slide">
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+            {% for slide in page.homepage.slides.all %}
+            <li data-target="#myCarousel" data-slide-to="{{forloop.counter0}}" {% if forloop.first %}class="active"{% endif %}></li>
+            {% endfor %}
+        </ol>
+
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner">
+            {% for slide in page.homepage.slides.all %}
+            <div class="item {% if forloop.first %}active{% endif %}">
+                <div class="fill" style="background-image:url({{MEDIA_URL}}{{slide.image}});"></div>
+                <div class="carousel-caption">
+                    <h1 style="color:{{slide.text_colour}};">{{slide.caption|safe}}</h1>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Controls -->
+        <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+            <span class="icon-prev"></span>
+        </a>
+        <a class="right carousel-control" href="#myCarousel" data-slide="next">
+            <span class="icon-next"></span>
+        </a>
+    </div>
+    {% endif %}
+
+
+    {% blog_recent_posts 3 as recent_posts %}
+    {% if recent_posts %}
+    <div class="section"> 
+    <div class="container"> 
+        <h1>{{page.homepage.latest_posts_heading}}</h1>
+        <div class="row"> 
+            {% for blog_post in recent_posts %}
+            <div class="col-lg-3 col-md-3">
+                {% editable blog_post.title %}
+                <h3><i class="fa fa-file-text-o"></i> <a href="{{ blog_post.get_absolute_url }}">{{ blog_post.title|truncatechars:22 }}</a></h3>
+                {% endeditable %}
+                {% editable blog_post.publish_date %}
+                <h6 class="post-meta">
+                {% trans "Posted by" %}:
+                {% with blog_post.user as author %}
+                <a href="{% url "blog_post_list_author" author %}">{{ author.get_full_name|default:author.username }}</a>
+                {% endwith %}
+                {% with blog_post.categories.all as categories %}
+                {% if categories %}
+                {% trans "in" %}
+                {% for category in categories %}
+                <a href="{% url "blog_post_list_category" category.slug %}">{{ category }}</a>{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+                {% blocktrans with sometime=blog_post.publish_date|timesince %}{{ sometime }} ago{% endblocktrans %}
+                </h6>
+                {% endeditable %}
+
+                {% editable blog_post.content %}
+                {{ blog_post.description_from_content|truncatechars:80|safe }}
+                {% endeditable %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    </div>
+    {% endif %}
+
+
+    {% if page.homepage.statements.all %}
+    <div class="section">
+    {% for statement in page.homepage.statements.all %}
+
+    <div class="container">
+        <div class="row statement">
+        {% if statement.title %}
+            <h1></i> {% editable statement.title %}{{statement.title}}{% endeditable %}</h1>
+        {% endif %}
+        {% if statement.image %}
+            {% editable statement.image_align %}
+            <img class="statement-image-{{statement.image_align}}" src="{{ MEDIA_URL }}{{statement.image}}" />
+            {% endeditable %}
+        {% endif %}
+
+
+        <p>{% editable statement.content %}{{statement.content|richtext_filters|safe}}{% endeditable %}</p>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+    {% endif %}
+
+    
+    
+    {% tweets_default as tweets %}
+    {% if tweets %}
+    <div class="section"> 
+    <div class="container"> 
+        <h1>Recent Tweets</h1>
+        <div class="row"> 
+            {% for tweet in tweets %}
+            <div class="col-lg-3 col-md-3">
+        <img class="pull-left tweeter-image" src="{{ tweet.profile_image_url|cut:"http:" }}" alt="{{ tweet.full_name }}">
+                <h4>{{ tweet.full_name }} <small><a href="http://twitter.com/{{ tweet.user_name }}" title="{{ tweet.full_name }}">@{{ tweet.user_name }}</a></small></h4>
+                <p>{{ tweet.text|safe }}<br>
+                <small class="timespan">
+                    {% blocktrans with sometime=tweet.created_at|timesince %}{{ sometime }} ago{% endblocktrans %}
+                    <a href="http://twitter.com/{{ tweet.user_name }}/status/{{ tweet.remote_id }}"><span class="glyphicon glyphicon-new-window"></span></a>
+                </small></p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    </div>
+    {% endif %}
+
+
+    {% if page.homepage.blurbs.all %}
+        <div class="container">
+            <div class="row">
+                {% for blurb in page.homepage.blurbs.all %}
+                <div class="col-lg-4 col-md-4">
+                    <h3>{% editable blurb.icon %}<i class="fa {{blurb.icon}}"></i>{% endeditable %} {% editable blurb.title %}{{blurb.title}}{% endeditable %} </h3>
+                    <p>{% editable blurb.content %}{{blurb.content|richtext_filters|safe}}{% endeditable %}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+
