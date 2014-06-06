@@ -34,7 +34,7 @@
     {% endif %}
 
 
-    {% blog_recent_posts 3 as recent_posts %}
+    {% blog_recent_posts 4 as recent_posts %}
     {% if recent_posts %}
     <div class="section"> 
     <div class="container"> 
@@ -43,7 +43,7 @@
             {% for blog_post in recent_posts %}
             <div class="col-lg-3 col-md-3">
                 {% editable blog_post.title %}
-                <h3><i class="fa fa-file-text-o"></i> <a href="{{ blog_post.get_absolute_url }}">{{ blog_post.title|truncatechars:22 }}</a></h3>
+                <h3><i class="fa fa-file-text-o"></i> <a href="{{ blog_post.get_absolute_url }}">{{ blog_post.title|truncatechars:20 }}</a></h3>
                 {% endeditable %}
                 {% editable blog_post.publish_date %}
                 <h6 class="post-meta">
@@ -64,7 +64,7 @@
                 {% endeditable %}
 
                 {% editable blog_post.content %}
-                {{ blog_post.description_from_content|truncatechars:80|safe }}
+                {{ blog_post.description_from_content|truncatewords_html:11|safe }}
                 {% endeditable %}
             </div>
             {% endfor %}
